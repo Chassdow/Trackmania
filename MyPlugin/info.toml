@@ -1,0 +1,10 @@
+[plugin]
+name = "My First Plugin"
+author = "Chassdow"
+category = "Debug"
+version = "1.0"
+siteid = ""
+
+[script]
+entry = "main.as"
+dependencies = ["VehicleState"]
