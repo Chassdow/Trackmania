@@ -16,13 +16,11 @@ class TrackmaniaAI:
             'nothing'
         ]
         
-        # Paramètres d'apprentissage
         self.learning_rate = 0.1
         self.discount_factor = 0.95
-        self.epsilon = 0.3  # Taux d'exploration
-        self.q_table = {}  # Table Q-learning
+        self.epsilon = 0.3 
+        self.q_table = {} 
         
-        # État précédent pour l'apprentissage
         self.previous_state = None
         self.previous_action = None
         self.previous_checkpoint = None
@@ -42,20 +40,17 @@ class TrackmaniaAI:
         if previous_state is None:
             return 0
             
-        # Récompense de base pour le mouvement
         distance = np.sqrt(
             (current_state[0] - previous_state[0])**2 +
             (current_state[1] - previous_state[1])**2 +
             (current_state[2] - previous_state[2])**2
         )
         
-        reward = distance * (current_state[3] / 100)  # Distance × Vitesse normalisée
+        reward = distance * (current_state[3] / 100) 
         
-        # Bonus pour passage de checkpoint
         if checkpoint_passed:
             reward += 1000
             
-        # Pénalité si la voiture recule ou ne bouge pas
         if distance < 0.1:
             reward -= 50
             
@@ -79,7 +74,6 @@ class TrackmaniaAI:
         if next_state not in self.q_table:
             self.q_table[next_state] = {action: 0 for action in self.actions}
             
-        # Formule Q-learning
         old_value = self.q_table[state][action]
         next_max = max(self.q_table[next_state].values())
         new_value = (1 - self.learning_rate) * old_value + \
@@ -114,7 +108,6 @@ class TrackmaniaAI:
         print("🏁 Démarrage de la course...")
         df = pd.read_csv(csv_file)
         
-        # Attendre que le joueur soit prêt
         print("⚠️ Placez la voiture sur la ligne de départ")
         print("⚡ Démarrage dans 3 secondes...")
         time.sleep(3)
@@ -127,12 +120,10 @@ class TrackmaniaAI:
             action = self.choose_action(current_state)
             self.controller.apply_action(action)
             
-            # Vérifier si la voiture est bloquée
             if self.controller.check_stagnation((row['PosX'], row['PosY'], row['PosZ'])):
                 self.controller.restart_race()
                 break
                 
-            # Attendre le bon timing
             target_time = start_time + (row['RaceTime'] / 1000.0)
             while time.time() < target_time:
                 pass

@@ -16,7 +16,6 @@ def main():
                        help='Charger un modèle existant (chemin vers le fichier .npy)')
     args = parser.parse_args()
 
-    # Vérifier que le fichier CSV existe
     if not os.path.exists(args.csv):
         print(f"❌ Erreur : Le fichier {args.csv} n'existe pas")
         return
@@ -24,12 +23,10 @@ def main():
     print("🎮 Initialisation de l'IA Trackmania...")
     ai = TrackmaniaAI()
 
-    # Charger un modèle existant si spécifié
     if args.load and os.path.exists(args.load):
         print(f"📥 Chargement du modèle {args.load}")
         ai.q_table = load_model(args.load)
 
-    # Préparer les données
     print("📊 Préparation des données d'entraînement...")
     try:
         data = prepare_training_data(args.csv)
@@ -37,7 +34,6 @@ def main():
         print(f"❌ Erreur : {e}")
         return
 
-    # Entraînement
     print(f"\n🚀 Démarrage de l'entraînement sur {args.episodes} épisodes")
     rewards_history = []
     
@@ -62,23 +58,19 @@ def main():
             ai.previous_state = current_state
             ai.previous_checkpoint = row['CurrentCP']
         
-        # Calculer la récompense totale de l'épisode
         total_reward = sum(episode_rewards)
         rewards_history.append(total_reward)
         
         print(f"💫 Récompense totale : {total_reward:.2f}")
         
-        # Réduire epsilon progressivement
         ai.epsilon = max(0.01, ai.epsilon * 0.995)
 
-    # Sauvegarder le modèle et tracer la progression
     print("\n💾 Sauvegarde du modèle...")
     save_model(ai.q_table)
     
     print("📈 Génération du graphique de progression...")
     plot_training_progress(rewards_history)
 
-    # Mode test si demandé
     if args.test:
         print("\n🏁 Démarrage du mode test...")
         print("⚠️ Assurez-vous que Trackmania est en premier plan")
